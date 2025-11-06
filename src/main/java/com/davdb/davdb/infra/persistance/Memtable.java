@@ -6,16 +6,17 @@ import com.davdb.davdb.infra.persistance.serialization.Serializer;
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Memtable<K, V> {
 
     private TreeMap<K, V> table = new TreeMap<>();
-    private final Integer MEMTABLE_SIZE_LIMIT = 3;
-    private boolean frozen = false;
+    private final Integer MEMTABLE_SIZE_LIMIT = 1000;
 
     Serializer<K> keySerializer;
     Serializer<V> valueSerializer;
     SSTableReader<K,V> tableReader;
+    AtomicBoolean frozen = new AtomicBoolean(false);
 
 
     public Memtable(Serializer<K> keySerializer, Serializer<V> valueSerializer) {
@@ -30,7 +31,7 @@ public class Memtable<K, V> {
 
     public V insert(Entry<K, V> entry) throws Exception {
 
-        if(this.frozen) throw new Exception("[SStable] Attempting to write to memtable while it`s frozen");
+        if(this.frozen.get()) throw new Exception("[SStable] Attempting to write to memtable while it`s frozen");
 
         V result = table.put(entry.getkey(), entry.getValue());
 
@@ -63,7 +64,10 @@ public class Memtable<K, V> {
     }
 
     private void freezeToggle() {
-        this.frozen = !this.frozen;
+        boolean prev;
+        do {
+            prev = frozen.get();
+        } while (!frozen.compareAndSet(prev, !prev));
     }
 
     private void flush(SortedMap<K,V> table) {

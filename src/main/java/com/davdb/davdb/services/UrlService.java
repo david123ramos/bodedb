@@ -19,7 +19,7 @@ public class UrlService {
         this.memtable = new Memtable<>(keySerializer, urlInfoSerializer);
     }
 
-    public void saveUrlClick(UrlEntryDTO entry) {
+    public void saveUrlClick(UrlEntryDTO entry) throws Exception {
         System.out.println("[INFO] Received: "+entry);
         Url entity = new Url( entry.getUrl(), UrlInfo.from(entry));
 
@@ -27,6 +27,7 @@ public class UrlService {
             memtable.insert(entity);
         }catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
 
     }

@@ -26,7 +26,7 @@ public class UrlController {
     }
 
     @PostMapping
-    public ResponseEntity<String> saveUrl(@RequestBody UrlEntryDTO entry) {
+    public ResponseEntity<String> saveUrl(@RequestBody UrlEntryDTO entry) throws Exception {
         this.urlService.saveUrlClick(entry);
         return ResponseEntity.ok("👍");
     }
