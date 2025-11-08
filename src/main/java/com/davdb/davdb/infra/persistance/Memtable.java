@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Memtable<K, V> {
 
     private AtomicReference<ConcurrentSkipListMap<K, V>> table = new AtomicReference<>(new ConcurrentSkipListMap<>());
-    private final Integer MEMTABLE_SIZE_LIMIT = 1000;
+    private final Integer MEMTABLE_SIZE_LIMIT = 5;
 
     Serializer<K> keySerializer;
     Serializer<V> valueSerializer;
@@ -39,7 +39,7 @@ public class Memtable<K, V> {
         SortedMap<K,V> currentTable = table.get();
         V result = currentTable.put(entry.getkey(), entry.getValue());
 
-        if(sz.incrementAndGet() >= MEMTABLE_SIZE_LIMIT && rotating.compareAndSet(false, true)) {
+        if(result == null && sz.incrementAndGet() >= MEMTABLE_SIZE_LIMIT && rotating.compareAndSet(false, true)) {
             System.out.println("[MEMTABLE] Limit reached! Flushing data");
             try{
                 rotate();
