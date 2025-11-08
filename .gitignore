@@ -1,5 +1,7 @@
 HELP.md
 target/
+data/table/
+data/CURRENT.TXT
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
