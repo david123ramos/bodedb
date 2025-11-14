@@ -26,7 +26,7 @@ public class Memtable<K, V> {
         this.valueSerializer = valueSerializer;
     }
 
-    public V insert(Entry<K, V> entry) throws Exception {
+    public V insert(Entry<K, V> entry) {
 
         SortedMap<K,V> currentTable = table.get();
         V result = currentTable.put(entry.getkey(), entry.getValue());
