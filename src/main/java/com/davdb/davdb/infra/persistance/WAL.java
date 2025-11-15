@@ -1,6 +1,7 @@
 package com.davdb.davdb.infra.persistance;
 
 import com.davdb.davdb.infra.persistance.entity.Entry;
+import com.davdb.davdb.infra.persistance.entity.WALLine;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.CRC32;
 
@@ -16,8 +18,7 @@ public class WAL<K, V> {
 
     private final BufferedWriter logWriter;
     private final AtomicInteger lsnCounter = new AtomicInteger(0);
-    private final String WAL_SEPARATOR = "|";
-    private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(1_000);
+    private final BlockingQueue<WALLine> queue = new ArrayBlockingQueue<>(1_000);
 
 
     public WAL() throws IOException {
@@ -27,7 +28,8 @@ public class WAL<K, V> {
         startWritePooling();
     }
 
-    public void write(Entry<K,V> entry)  {
+    public CompletableFuture<Boolean> write(Entry<K,V> entry)  {
+        String WAL_SEPARATOR = "|";
         String checksumValue = entry.getkey().toString() + WAL_SEPARATOR + entry.getValue().toString();
         CRC32 crc32 = new CRC32();
         crc32.update(checksumValue.getBytes(StandardCharsets.UTF_8));
@@ -40,11 +42,14 @@ public class WAL<K, V> {
                                                         .append(WAL_SEPARATOR)
                                                                 .append(crc32.getValue());
 
-        boolean hasSaved = this.queue.offer(sb.toString());
+
+        CompletableFuture<Boolean> ack = new CompletableFuture<>();
+        boolean hasSaved = this.queue.offer(new WALLine(sb.toString(),ack));
 
         if (!hasSaved) {
             throw new RuntimeException("[WAL] error on sending write command to WAL queue");
         }
+        return ack;
     }
 
     private void startWritePooling() {
@@ -52,10 +57,11 @@ public class WAL<K, V> {
             System.out.println("[WAL] Stating background thread to save records in WAL");
             while (true) {
                 try {
-                    String line = queue.take();
-                    logWriter.write(line);
+                    WALLine walLine = queue.take();
+                    logWriter.write(walLine.getLine());
                     logWriter.newLine();
                     logWriter.flush();
+                    walLine.getAck().complete(true);
                 } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }

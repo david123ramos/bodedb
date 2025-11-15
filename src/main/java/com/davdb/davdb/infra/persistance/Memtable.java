@@ -6,7 +6,9 @@ import com.davdb.davdb.infra.persistance.serialization.Serializer;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.SortedMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,9 +24,13 @@ public class Memtable<K, V> {
     AtomicBoolean rotating = new AtomicBoolean(false);
     AtomicInteger sz = new AtomicInteger(0);
 
+    boolean isSynchronousCommitActive = Boolean.parseBoolean(System.getenv("DAVDB_SYNCHRONOUS_WAL_COMMIT_ACTIVE"));
+
     public Memtable(Serializer<K> keySerializer, Serializer<V> valueSerializer) {
         this.keySerializer = keySerializer;
         this.valueSerializer = valueSerializer;
+
+        System.out.println("[MEMTABLE - WAL persistance type] synchronous commit is " + (this.isSynchronousCommitActive ? "active" : "deactivated"));
 
         try {
             this.WALService = new WAL();
@@ -35,9 +41,11 @@ public class Memtable<K, V> {
 
     }
 
-    public V insert(Entry<K, V> entry) {
+    public V insert(Entry<K, V> entry) throws ExecutionException, InterruptedException {
 
-        WALService.write(entry);
+        CompletableFuture resultWalLine = WALService.write(entry);
+
+        if(isSynchronousCommitActive) resultWalLine.get();
 
         SortedMap<K,V> currentTable = table.get();
         V result = currentTable.put(entry.getkey(), entry.getValue());
