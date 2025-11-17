@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Memtable<K, V> {
 
     private AtomicReference<ConcurrentSkipListMap<K, V>> table = new AtomicReference<>(new ConcurrentSkipListMap<>());
-    private final Integer MEMTABLE_SIZE_LIMIT = 3;
+    private final Integer MEMTABLE_SIZE_LIMIT = 1_000;
     private final WAL<K,V> WALService;
 
     Serializer<K> keySerializer;
