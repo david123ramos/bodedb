@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Memtable<K, V> {
+public class Memtable<K extends Comparable<K>, V> {
 
     private AtomicReference<ConcurrentSkipListMap<K, V>> table = new AtomicReference<>(new ConcurrentSkipListMap<>());
     private final Integer MEMTABLE_SIZE_LIMIT = 1_000;

@@ -2,13 +2,11 @@ package com.davdb.davdb.controllers;
 
 
 import com.davdb.davdb.models.dto.UrlEntryDTO;
-import com.davdb.davdb.models.entity.UrlInfo;
 import com.davdb.davdb.services.UrlService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.SortedMap;
 
 @RestController
 @RequestMapping("/v1/url")
@@ -29,11 +27,6 @@ public class UrlController {
     public ResponseEntity<String> saveUrl(@RequestBody UrlEntryDTO entry) throws Exception {
         this.urlService.saveUrlClick(entry);
         return ResponseEntity.ok("👍");
-    }
-
-    @GetMapping
-    public ResponseEntity<SortedMap<String, UrlInfo>> readLast(){
-        return ResponseEntity.ok(this.urlService.readLast());
     }
 
 }

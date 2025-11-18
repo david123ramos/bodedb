@@ -8,7 +8,7 @@ import com.davdb.davdb.infra.persistance.serialization.Serializer;
 import java.util.concurrent.ExecutionException;
 
 
-public class DavDBImpl<K,V> implements DavDB<K, V> {
+public class DavDBImpl<K extends Comparable<K>, V> implements DavDB<K, V> {
 
     private Memtable<K, V> memtable;
     private SSTableReader<K, V> chunkReader;
