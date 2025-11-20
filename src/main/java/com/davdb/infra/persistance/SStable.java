@@ -29,6 +29,45 @@ public class SStable<K,V> {
         this.valueSerializer = valueSerializer;
     }
 
+    /*
+    *
+    * |---------HEADER----------------------|
+    * | MAGIC_NUMBER: 0xF1A5C0DB (fiasco db)|
+    * |-------------------------------------|
+    * |DATA BLOCKS -------------------------|
+    * |      |BLOCK 1---------------------| |
+    * |      |    key1 - value1           | |
+    * |      |    key2 - value2           | |
+    * |      |    key3 - value3           | |
+    * |      |----------------------------| |
+    * |      | block1 checksum            | |
+    * |      |----------------------------| |
+    * |      |BLOCK N---------------------| |
+    * |      |    keyN - valueN           | |
+    * |      |    keyN2 - valueN2         | |
+    * |      |    keyN3 - valueN3         | |
+    * |      |----------------------------| |
+    * |      | block1 checksum            | |
+    * |      |----------------------------| |
+    * |-------------------------------------|
+    * |INDEX -------------------------------|
+    * | key1 @ offset 4931 @ block 1        |
+    * | keyN @ offset 8741 @ block N        |
+    * | index checksum                      |
+    * |-------------------------------------|
+    * |CUCKOO FILTER -----------------------|
+    * | entries: [1,2,4,5...N]              |
+    * | bucket: 3                           |
+    * | finger: 3bits                       |
+    * |-------------------------------------|
+    * |Footer-------------------------------|
+    * |index @ offset 1023912               |
+    * |index_size: 1231231344               |
+    * |cuckoo_filter @ offset 1209483       |
+    * |cuckoo_filter_size: 19234            |
+    * |MAGIC_NUMBER: 0xF1A5C0DBE7A11 (fiasco db tail)
+    * |=====================================|
+    * */
     public void writeToFile() {
         System.out.println("[SSTable] Saving memtable in sstable file");
         String tablename = "table/sstable_"+ LocalDateTime.now().toInstant(ZoneOffset.UTC)+".sst";
