@@ -1,9 +1,9 @@
-package com.davdb.davdb.infra.db.impl;
+package com.davdb.infra.db.impl;
 
-import com.davdb.davdb.infra.db.DavDB;
-import com.davdb.davdb.infra.persistance.Memtable;
-import com.davdb.davdb.infra.persistance.SSTableReader;
-import com.davdb.davdb.infra.persistance.serialization.Serializer;
+import com.davdb.infra.db.DavDB;
+import com.davdb.infra.persistance.Memtable;
+import com.davdb.infra.persistance.SSTableReader;
+import com.davdb.infra.persistance.serialization.Serializer;
 
 import java.util.concurrent.ExecutionException;
 
@@ -14,9 +14,9 @@ public class DavDBImpl<K extends Comparable<K>, V> implements DavDB<K, V> {
     private SSTableReader<K, V> chunkReader;
 
 
-    public DavDBImpl(Serializer<K> keySerializer, Serializer<V> urlInfoSerializer) {
-        this.memtable = new Memtable<>(keySerializer, urlInfoSerializer);
-        this.chunkReader = new SSTableReader<>(keySerializer, urlInfoSerializer);
+    public DavDBImpl(Serializer<K> keySerializer, Serializer<V> valueSerializer) {
+        this.memtable = new Memtable<>(keySerializer, valueSerializer);
+        this.chunkReader = new SSTableReader<>(keySerializer, valueSerializer);
     }
 
     @Override

@@ -1,6 +1,6 @@
-package com.davdb.davdb.models.entity;
+package com.davdb.models.entity;
 
-import com.davdb.davdb.models.dto.UrlEntryDTO;
+import com.davdb.models.dto.UrlEntryDTO;
 
 import java.time.LocalDateTime;
 

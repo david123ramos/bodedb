@@ -1,4 +1,4 @@
-package com.davdb.davdb.infra.persistance.entity;
+package com.davdb.infra.persistance.entity;
 
 import java.util.concurrent.CompletableFuture;
 

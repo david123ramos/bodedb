@@ -1,4 +1,4 @@
-package com.davdb.davdb;
+package com.davdb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

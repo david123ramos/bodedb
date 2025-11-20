@@ -1,6 +1,6 @@
-package com.davdb.davdb.models.entity;
+package com.davdb.models.entity;
 
-import com.davdb.davdb.infra.persistance.entity.Entry;
+import com.davdb.infra.persistance.entity.Entry;
 
 public class Url implements Entry<String, UrlInfo> {
 

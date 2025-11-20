@@ -1,4 +1,4 @@
-package com.davdb.davdb.models.dto;
+package com.davdb.models.dto;
 
 import java.time.LocalDateTime;
 

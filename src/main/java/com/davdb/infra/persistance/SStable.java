@@ -1,6 +1,6 @@
-package com.davdb.davdb.infra.persistance;
+package com.davdb.infra.persistance;
 
-import com.davdb.davdb.infra.persistance.serialization.Serializer;
+import com.davdb.infra.persistance.serialization.Serializer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

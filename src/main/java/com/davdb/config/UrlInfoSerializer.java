@@ -1,7 +1,7 @@
-package com.davdb.davdb.config;
+package com.davdb.config;
 
-import com.davdb.davdb.infra.persistance.serialization.Serializer;
-import com.davdb.davdb.models.entity.UrlInfo;
+import com.davdb.infra.persistance.serialization.Serializer;
+import com.davdb.models.entity.UrlInfo;
 import org.springframework.stereotype.Component;
 
 import java.io.DataInputStream;

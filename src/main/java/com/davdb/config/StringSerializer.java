@@ -1,13 +1,12 @@
-package com.davdb.davdb.config;
+package com.davdb.config;
 
 
-import com.davdb.davdb.infra.persistance.serialization.Serializer;
+import com.davdb.infra.persistance.serialization.Serializer;
 import org.springframework.stereotype.Component;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @Component

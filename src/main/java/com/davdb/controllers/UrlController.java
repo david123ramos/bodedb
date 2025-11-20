@@ -1,8 +1,8 @@
-package com.davdb.davdb.controllers;
+package com.davdb.controllers;
 
 
-import com.davdb.davdb.models.dto.UrlEntryDTO;
-import com.davdb.davdb.services.UrlService;
+import com.davdb.models.dto.UrlEntryDTO;
+import com.davdb.services.UrlService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

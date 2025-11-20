@@ -1,4 +1,4 @@
-package com.davdb.davdb.infra.db;
+package com.davdb.infra.db;
 
 public interface DavDB<K,V> {
 

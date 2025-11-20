@@ -1,9 +1,9 @@
-package com.davdb.davdb.services;
+package com.davdb.services;
 
-import com.davdb.davdb.infra.db.impl.DavDBImpl;
-import com.davdb.davdb.infra.persistance.serialization.Serializer;
-import com.davdb.davdb.models.dto.UrlEntryDTO;
-import com.davdb.davdb.models.entity.UrlInfo;
+import com.davdb.infra.db.impl.DavDBImpl;
+import com.davdb.infra.persistance.serialization.Serializer;
+import com.davdb.models.dto.UrlEntryDTO;
+import com.davdb.models.entity.UrlInfo;
 import org.springframework.stereotype.Service;
 
 @Service

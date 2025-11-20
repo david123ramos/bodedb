@@ -1,4 +1,4 @@
-package com.davdb.davdb.infra.persistance.serialization;
+package com.davdb.infra.persistance.serialization;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

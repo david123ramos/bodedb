@@ -1,6 +1,6 @@
-package com.davdb.davdb.infra.persistance;
+package com.davdb.infra.persistance;
 
-import com.davdb.davdb.infra.persistance.entity.WALLine;
+import com.davdb.infra.persistance.entity.WALLine;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

@@ -1,4 +1,4 @@
-package com.davdb.davdb;
+package com.davdb;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
