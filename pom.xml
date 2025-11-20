@@ -8,11 +8,11 @@
 		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.davdb</groupId>
-	<artifactId>davdb</artifactId>
+	<groupId>com.bodedb</groupId>
+	<artifactId>bodedb</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>davdb</name>
-	<description>Demo project for learning purposes of database implementation </description>
+	<name>bodedb</name>
+	<description>Learning purporses key-value distributed database</description>
 	<url/>
 	<licenses>
 		<license/>
