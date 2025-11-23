@@ -1,6 +1,8 @@
 package com.bodedb.infra.persistance;
 
 import com.bodedb.infra.persistance.serialization.Serializer;
+import com.bodedb.infra.persistance.sstable.Footer;
+import com.bodedb.infra.persistance.sstable.Header;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +12,7 @@ import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.zip.CRC32;
 
 public class SStable<K,V> {
     private final SortedMap<K,V> map;
@@ -65,7 +68,7 @@ public class SStable<K,V> {
     * |index_size: 1231231344               |
     * |Bloom_filter @ offset 1209483        |
     * |Bloom_filter_size: 19234             |
-    * |MAGIC_NUMBER: 0xB0DEDB7A11 (bode db tail)
+    * |MAGIC_NUMBER: 0xB0DEBDED (bode db END)
     * |=====================================|
     * */
     public void writeToFile() {
@@ -77,11 +80,26 @@ public class SStable<K,V> {
         try (DataOutputStream dos = new DataOutputStream(
                 new BufferedOutputStream(new FileOutputStream(file)))) {
 
+            writeHeader(dos);
+            StringBuilder sb = new StringBuilder();
+            int counter = 0;
+
             for (Map.Entry<K, V> entry : this.map.entrySet()) {
+                sb.append(entry.getKey());
+
+                if(counter >= 100) {
+                    writeBlockCheckSum(sb, dos);
+                    sb = new StringBuilder();
+                    counter = 0;
+                }
 
                 keySerializer.write(entry.getKey(), dos);
                 valueSerializer.write(entry.getValue(), dos);
+
+                counter++;
             }
+
+            writeFooter(dos);
 
             dos.flush();
             System.out.println("[SSTable] Flushed binary SSTable: " + file.getAbsolutePath());
@@ -91,6 +109,37 @@ public class SStable<K,V> {
         }
 
         updateCurrentFile(tablename);
+    }
+
+    void writeHeader(DataOutputStream out) throws IOException {
+        out.writeInt(Header.MAGIC_NUMBER);
+    }
+
+    void writeBlockCheckSum(StringBuilder sb, DataOutputStream  dos) throws IOException {
+        CRC32 crc32 = new CRC32();
+        crc32.update(sb.toString().getBytes(StandardCharsets.UTF_8));
+        dos.writeInt(0xB0DECF);
+        dos.writeLong(crc32.getValue());
+    }
+
+    //footer specifies and magicNumber of EOF, index pointing to index position at file
+    //bloom, pointing to start of definition of bloom filter at file and their respective sizes
+    // each memory location occupies only 8 bytes each.
+    void writeFooter(DataOutputStream dos) throws IOException {
+
+        dos.writeInt("INDEX".length());
+        dos.write(new byte[8]);
+
+        dos.writeInt("INDEX_SIZE".length());
+        dos.write(new byte[8]);
+
+        dos.writeInt("BLOOM".length());
+        dos.write(new byte[8]);
+
+        dos.writeInt("BLOOM_SIZE".length());
+        dos.write(new byte[8]);
+
+        dos.writeInt(Footer.MAGIC_NUMBER);
     }
 
     private SortedMap<K,V> readFromDisk(String sstablePath) throws Exception {
