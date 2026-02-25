@@ -5,22 +5,13 @@ import com.bodedb.infra.persistance.serialization.Serializer;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
-//Epoch-based reclamation
-class ThreadedTable<K, V> {
-    public final ConcurrentSkipListMap<K, V> map = new ConcurrentSkipListMap<>();
-    public AtomicInteger size = new AtomicInteger(0);
-    public AtomicInteger holders = new AtomicInteger(0);
-}
 
 public class Memtable<K extends Comparable<K>, V> {
 
-    private AtomicReference<ThreadedTable<K, V>> table = new AtomicReference<>(new ThreadedTable<K, V>());
+    private AtomicReference<MemtableState<K, V>> table = new AtomicReference<>(new MemtableState<K, V>());
     private final Integer MEMTABLE_SIZE_LIMIT = 4;
     private final WAL<K, V> WALService;
 
@@ -53,7 +44,7 @@ public class Memtable<K extends Comparable<K>, V> {
         if (isSynchronousCommitActive)
             resultWalLine.get();
 
-        ThreadedTable<K, V> state;
+        MemtableState<K, V> state;
 
         while (true) {
             state = this.table.get();
@@ -92,12 +83,12 @@ public class Memtable<K extends Comparable<K>, V> {
     }
 
     public void rotate() {
-        ThreadedTable<K, V> memtableToFlush = table.getAndSet(new ThreadedTable<K, V>());
+        MemtableState<K, V> memtableToFlush = table.getAndSet(new MemtableState<K, V>());
 
         flush(memtableToFlush);
     }
 
-    private void flush(ThreadedTable<K, V> memtableToFlush) {
+    private void flush(MemtableState<K, V> memtableToFlush) {
 
         Runnable writeToDisk = () -> {
             try {
