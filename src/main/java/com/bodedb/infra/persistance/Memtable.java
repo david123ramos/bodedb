@@ -4,7 +4,6 @@ import com.bodedb.infra.persistance.serialization.Serializer;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.SortedMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
@@ -98,16 +97,16 @@ public class Memtable<K extends Comparable<K>, V> {
         flush(memtableToFlush);
     }
 
-    private void flush(ThreadedTable<K, V> table) {
+    private void flush(ThreadedTable<K, V> memtableToFlush) {
 
         Runnable writeToDisk = () -> {
             try {
 
-                while (table.holders.get() > 0) {
+                while (memtableToFlush.holders.get() > 0) {
                     Thread.onSpinWait();
                 }
 
-                new SStable<>(Collections.unmodifiableSortedMap(table.map), keySerializer, valueSerializer)
+                new SStable<>(Collections.unmodifiableSortedMap(memtableToFlush.map), keySerializer, valueSerializer)
                         .writeToFile();
             } finally {
                 rotating.set(false);
