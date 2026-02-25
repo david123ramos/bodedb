@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+//Epoch-based reclamation
 class ThreadedTable<K, V> {
     public final ConcurrentSkipListMap<K, V> map = new ConcurrentSkipListMap<>();
     public AtomicInteger size = new AtomicInteger(0);
@@ -94,18 +95,20 @@ public class Memtable<K extends Comparable<K>, V> {
     public void rotate() {
         ThreadedTable<K, V> memtableToFlush = table.getAndSet(new ThreadedTable<K, V>());
 
-        while (memtableToFlush.holders.get() > 0) {
-            Thread.onSpinWait();
-        }
-
-        flush(Collections.unmodifiableSortedMap(memtableToFlush.map));
+        flush(memtableToFlush);
     }
 
-    private void flush(SortedMap<K, V> table) {
+    private void flush(ThreadedTable<K, V> table) {
 
         Runnable writeToDisk = () -> {
             try {
-                new SStable<>(table, keySerializer, valueSerializer).writeToFile();
+
+                while (table.holders.get() > 0) {
+                    Thread.onSpinWait();
+                }
+
+                new SStable<>(Collections.unmodifiableSortedMap(table.map), keySerializer, valueSerializer)
+                        .writeToFile();
             } finally {
                 rotating.set(false);
             }
