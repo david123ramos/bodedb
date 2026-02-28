@@ -20,4 +20,8 @@ public class UrlService {
         this.bodeDB.put(entry.getUrl(), UrlInfo.from(entry));
     }
 
+    public boolean read() {
+        return this.bodeDB.read();
+    }
+
 }

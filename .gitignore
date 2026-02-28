@@ -1,5 +1,5 @@
 target/
-data/table/
+data/
 data/CURRENT.TXT
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

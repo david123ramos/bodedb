@@ -1,6 +1,7 @@
 package com.bodedb.controllers;
 
 
+import com.bodedb.infra.db.BodeDB;
 import com.bodedb.models.dto.UrlEntryDTO;
 import com.bodedb.services.UrlService;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,11 @@ public class UrlController {
     public ResponseEntity<String> saveUrl(@RequestBody UrlEntryDTO entry) throws Exception {
         this.urlService.saveUrlClick(entry);
         return ResponseEntity.ok("👍");
+    }
+
+    @GetMapping("/read")
+    public ResponseEntity<Boolean> read() {
+        return ResponseEntity.ok(this.urlService.read());
     }
 
 }
